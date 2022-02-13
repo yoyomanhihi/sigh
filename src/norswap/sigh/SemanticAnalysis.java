@@ -26,7 +26,7 @@ import static norswap.utils.visitors.WalkVisitType.POST_VISIT;
 import static norswap.utils.visitors.WalkVisitType.PRE_VISIT;
 
 /**
- * Holds the logic implementing semantic analyzis for the language, including typing and name
+ * Holds the logic implementing semantic analysis for the language, including typing and name
  * resolution.
  *
  * <p>The entry point into this class is {@link #createWalker(Reactor)}.
@@ -906,7 +906,7 @@ public final class SemanticAnalysis
 
     // ---------------------------------------------------------------------------------------------
 
-    /** Get the depedencies necessary to compute the "returns" attribute of the parent. */
+    /** Get the dependencies necessary to compute the "returns" attribute of the parent. */
     private Attribute[] getReturnsDependencies (List<? extends SighNode> children) {
         return children.stream()
             .filter(Objects::nonNull)

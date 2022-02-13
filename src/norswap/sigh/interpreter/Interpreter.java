@@ -28,7 +28,7 @@ import static norswap.utils.Vanilla.map;
  * <h2>Limitations</h2>
  * <ul>
  *     <li>The compiled code currently doesn't support closures (using variables in functions that
- *     are declared in some surroudning scopes outside the function). The top scope is supported.
+ *     are declared in some surrounding scopes outside the function). The top scope is supported.
  *     </li>
  * </ul>
  *
@@ -470,7 +470,7 @@ public final class Interpreter
 
     private Void ifStmt (IfNode node)
     {
-        if (get(node.condition))
+        if ((boolean) get(node.condition))
             get(node.trueStatement);
         else if (node.falseStatement != null)
             get(node.falseStatement);
@@ -481,7 +481,7 @@ public final class Interpreter
 
     private Void whileStmt (WhileNode node)
     {
-        while (get(node.condition))
+        while ((boolean) get(node.condition))
             get(node.body);
         return null;
     }
