@@ -15,14 +15,14 @@ enum FractionErrorType {
 // This pattern (found in Haskell or Rust) can be used to handle errors without an exception system
 // The caller receives a result, and has to handle all cases (or transfer the error to its own parent)
 enum DivisionResult {
-    VALUE(var v: Float),
-    ERROR(var e: FractionErrorType)
+    VALUE(Float),
+    ERROR(FractionErrorType)
 }
 
 // 3. Functions, classes and structs can take generic types
 // The compiled code will be implemented once for each usage
 enum Optional<T> {
-    VALUE(var v: T),
+    VALUE(T),
     NOTHING
 }
 

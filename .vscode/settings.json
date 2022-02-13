@@ -6,7 +6,11 @@
         "ileft",
         "iright",
         "Ljava",
+        "lvalue",
+        "namespacing",
         "norswap",
-        "rvalue"
+        "rvalue",
+        "typeof",
+        "unscoped"
     ]
 }
