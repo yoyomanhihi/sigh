@@ -60,6 +60,9 @@ public final class InterpreterTests extends TestFixture {
         // (1) write proper parsing tests
         // (2) write some kind of automated runner, and use it here
 
+        // Ignore carriage return
+        input = input.replaceAll("\r", "");
+
         autumnFixture.rule = rule;
         ParseResult parseResult = autumnFixture.success(input);
         SighNode root = parseResult.topValue();
@@ -83,7 +86,7 @@ public final class InterpreterTests extends TestFixture {
 
         Pair<String, Object> result = IO.captureStdout(() -> interpreter.interpret(root));
         assertEquals(result.b, expectedReturn);
-        if (expectedOutput != null) assertEquals(result.a, expectedOutput);
+        if (expectedOutput != null) assertEquals(result.a.replaceAll("\r", ""), expectedOutput);
     }
 
     // ---------------------------------------------------------------------------------------------

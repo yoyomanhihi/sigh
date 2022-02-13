@@ -16,22 +16,23 @@ import static norswap.utils.Util.cast;
 import static org.testng.Assert.assertEquals;
 
 @SuppressWarnings("FieldCanBeLocal")
-public class BytecodeTests
-{
+public class BytecodeTests {
     // TODO test multi dimensional arrays
 
     // ---------------------------------------------------------------------------------------------
 
     /**
-     * Checks that the input program can be compiled, run and prints the {@code expected} string if
+     * Checks that the input program can be compiled, run and prints the
+     * {@code expected} string if
      * non-null (to which a newline is appended if not empty).
      */
-    public void check (String input, String expected)
-    {
+    public void check(String input, String expected) {
         SighGrammar grammar = new SighGrammar();
         ParseOptions options = ParseOptions.builder().recordCallStack(true).get();
         ParseResult parseResult = Autumn.parse(grammar.root, input, options);
-        if (!parseResult.fullMatch) throw new AssertionError(parseResult.toString());
+        if (!parseResult.fullMatch) {
+            throw new AssertionError(parseResult.toString());
+        }
 
         SighNode tree = cast(parseResult.topValue());
         Reactor reactor = new Reactor();
@@ -39,8 +40,9 @@ public class BytecodeTests
         walker.walk(tree);
         reactor.run();
 
-        if (!reactor.errors().isEmpty())
+        if (!reactor.errors().isEmpty()) {
             throw new AssertionError(reactor.reportErrors(Object::toString));
+        }
 
         String className = "BytecodeTestsRun";
         BytecodeCompiler compiler = new BytecodeCompiler(reactor);
@@ -60,20 +62,23 @@ public class BytecodeTests
             return null;
         }).a;
 
-        if (!expected.isEmpty())
+        if (!expected.isEmpty()) {
             expected = expected + "\n";
+        }
 
-        assertEquals(capture, expected);
+        // Ignore carriage returns
+        assertEquals(capture.replaceAll("\r", ""), expected);
     }
 
     // ---------------------------------------------------------------------------------------------
 
     /**
-     * Checks that the input <b>expression</b> can be converted to a string and printed, and that the printed
+     * Checks that the input <b>expression</b> can be converted to a string and
+     * printed, and that the printed
      * string corresponds to the {@code expected} string.
      */
-    public void checkExpr (String input, String expected) {
-        check("print(\"\" + ("+ input + "))", expected);
+    public void checkExpr(String input, String expected) {
+        check("print(\"\" + (" + input + "))", expected);
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -92,7 +97,7 @@ public class BytecodeTests
     // ---------------------------------------------------------------------------------------------
 
     @Test
-    public void testLiteralsAndUnary () {
+    public void testLiteralsAndUnary() {
         checkExpr("42", "42");
         checkExpr("42.0", "42.0");
         checkExpr("\"hello\"", "hello");
@@ -109,7 +114,7 @@ public class BytecodeTests
     // ---------------------------------------------------------------------------------------------
 
     @Test
-    public void testNumericBinary () {
+    public void testNumericBinary() {
         checkExpr("1 + 2", "3");
         checkExpr("2 - 1", "1");
         checkExpr("2 * 3", "6");
@@ -147,13 +152,14 @@ public class BytecodeTests
 
     // ---------------------------------------------------------------------------------------------
 
-    @Test public void testLogic() {
+    @Test
+    public void testLogic() {
         // check boolean logic
-        checkExpr("true  && true",  "true");
-        checkExpr("true  || true",  "true");
+        checkExpr("true  && true", "true");
+        checkExpr("true  || true", "true");
         checkExpr("true  || false", "true");
-        checkExpr("false || true",  "true");
-        checkExpr("false && true",  "false");
+        checkExpr("false || true", "true");
+        checkExpr("false && true", "false");
         checkExpr("true  && false", "false");
         checkExpr("false && false", "false");
         checkExpr("false || false", "false");
@@ -191,21 +197,18 @@ public class BytecodeTests
     // ---------------------------------------------------------------------------------------------
 
     @Test
-    public void testVarDecl () {
+    public void testVarDecl() {
         // TODO convert
-        check("var x: Int = 1; return x", "1");
-        check("var x: Float = 2.0; return x", "2");
-
-        check("var x: Int = 0; return x = 3", "3");
-        check("var x: String = \"0\"; return x = \"S\"", "S");
-
+        check("var x: Int = 1; print(\"\" + x)", "1");
+        check("var x: Float = 2.0; print(\"\" + x)", "2.0");
         // implicit conversions
-        check("var x: Float = 1; x = 2; return x", "2.0");
+        check("var x: Float = 1; x = 2; print(\"\" + x)", "2.0");
     }
 
     // ---------------------------------------------------------------------------------------------
 
-    @Test public void testArrays() {
+    @Test
+    public void testArrays() {
         checkExpr("[1, 2, 3]", "[1, 2, 3]");
         checkExpr("[\"a\", \"b\", \"c\"]", "[a, b, c]");
         checkExpr("[1.0, 2.0]", "[1.0, 2.0]");
@@ -225,7 +228,8 @@ public class BytecodeTests
     private final String printx = "print(\"\" + (x))";
     private final String printy = "print(\"\" + (y))";
 
-    @Test public void testVariables() {
+    @Test
+    public void testVariables() {
         check("var x: Int = 1;" + printx, "1");
         check("var x: String = \"a\";" + printx, "a");
         check("var x: Int = 1 ; " + printx + " ; x = 2 ; " + printx, "1\n2");
@@ -241,7 +245,8 @@ public class BytecodeTests
         check("var x: Float = 1 ;" + printx + "x = 2 ;" + printx, "1.0\n2.0");
     }
 
-    @Test public void testIfWhile() {
+    @Test
+    public void testIfWhile() {
         check("if 1 == 1 " + printa, "a");
         check("if 1 == 1 " + printa + "else " + printb, "a");
         check("if 1 == 0 " + printa + "else " + printb, "b");
@@ -250,17 +255,18 @@ public class BytecodeTests
         check("var x: Int = 1 ; while x <= 3 { " + printx + " ; x = x + 1 }", "1\n2\n3");
     }
 
-    @Test public void testMethod() {
+    @Test
+    public void testMethod() {
         check("fun test (x: String):String { return x } print(test(\"a\"))", "a");
         check("fun test (x: String) { print(x) } ; test(\"a\")", "a");
         check("fun test () { fun foo() { print(\"a\") } foo() foo() } test()", "a\na");
     }
 
-    private final String makePair =
-        "struct Pair { var x: Int ; var y: Float }" +
-        "var x: Pair = $Pair(1, 2.0) ;";
+    private final String makePair = "struct Pair { var x: Int ; var y: Float }" +
+            "var x: Pair = $Pair(1, 2.0) ;";
 
-    @Test public void testStructs() {
+    @Test
+    public void testStructs() {
         check(makePair + "print(\"\" + x.x + \":\" + x.y)", "1:2.0");
         check(makePair + "x.x = 3; print(\"\" + x.x)", "3");
         check(makePair + "x.y = 3; print(\"\" + x.y)", "3.0");
