@@ -19,6 +19,8 @@ enum DivisionResult {
     ERROR(FractionErrorType)
 }
 
+// enums have a "take(FIELD)" function that returns the contained value of the field FIELD. if it is not the correct field, stop the program instantly.
+
 // 3. Functions, classes and structs can take generic types
 // The compiled code will be implemented once for each usage
 enum Optional<T> {
@@ -190,3 +192,59 @@ for (var i: T = INIT to MAX step STEP) {}
 //    -> +(typeof(STEP)) -> possible to add STEP to it
 
 // no foreach loop because it would require to ship some types by default (like Optional)
+
+
+// 10. Bindings
+// A programming language is cool, but without a way to bind to the OS (directly or through libs), you can't do much
+// To fix this, we will introduce a binding system that will allow a program to bind to other JVM programs (.class)
+// There are two possibilities to implement this: either let the compiler compile and import .class files
+// (easier for the Sigh programmer, but requires a way to map class files to sigh data structures, as well as a .class parser
+// (harder, though simpler than sigh, but out of scope of this project))
+// The simplest possibility would be to create an interface in sigh that the compiler will map to external .class files
+
+// Idea: the class is a sigh class, but can perform function calls to the given bound java class
+// We decided to do this instead of directly allowing calls to the bounded class to allow a conversion layer between the two languages
+// Example: if a Java function returns null in case of an absence of value, the binding class can transform it into an Optional
+// Primitive types are automatically bound (int -> Int, bool -> Bool, String -> String, etc)
+
+// Last, a java function can throw exception, a behaviour replaced in Sigh by the enumerations containing values.
+// A system is thus needed to handle exceptions thrown by the bound function.
+
+class File bound to java.io.File {
+    fun $File(pathname: String) from Binding
+
+    fun $File() {
+        // Example of new constructor that doesn't exist in the bound class
+        binding = $Binding("./default.txt")
+    }
+
+    fun createNew() // The function name here is for internal sigh usage, it doesn't need to be the name of a java function
+    {
+        switch (binding.createNewFile()) {
+            case IOException(message) -> {
+                // Handle that
+            }
+        }
+    }
+
+    fun canRead(): Bool {
+        return binding.canRead().take(VALUE) // We use take to ignore all other variants. If an exception do occur, the program will stop.
+    }
+
+    fun ==(other: File): Bool {
+        return binding.equals(other).take(VALUE)
+    }
+}
+
+// Note: these bindings are not checked at compilation. The compiler will trust that the bound class indeed has the required functions.
+
+// Summary:
+// - A class can be bound to a java class which must be given with its fully specified name
+// - Inside the class, we have access to a Binding type which represent to Java class we are bound to
+// - if "from Binding" is added to a function, then its implementation is implicitly transferred to the bound class.
+//     - the function is supposed to exist with the same name and parameters
+//     - the type of the parameters must have a direct mapping from sigh to Java (either primitive, or a binding)
+//     - the return value will be taken and returned automatically (meaning that it will crash on exception)
+// - a call to a bound function returns an enum which contains a "VALUE" field as well as fields named like java exceptions. the type of the enum will be VALUE + used exception fields
+// - the binding keyword refers to the bound object (like "this", but for the bound class). it is read only, except in constructor where it must be affected once
+// - if there is enough time, the ``Binding`` class will be accessible for static functions
