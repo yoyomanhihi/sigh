@@ -5,11 +5,17 @@
         "fleft",
         "ileft",
         "iright",
+        "LANGLE",
         "Ljava",
+        "LSQUARE",
         "lvalue",
         "namespacing",
         "norswap",
+        "RANGLE",
+        "RSQUARE",
         "rvalue",
+        "struct",
+        "structs",
         "typeof",
         "unscoped"
     ]

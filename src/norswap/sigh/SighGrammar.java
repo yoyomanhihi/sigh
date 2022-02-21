@@ -16,6 +16,7 @@ public class SighGrammar extends Grammar
     public rule multiline_comment =
         seq("/*", seq(not("*/"), any).at_least(0), "*/");
 
+    // [ \t\n\r;]|
     public rule ws_item = choice(
         set(" \t\n\r;"),
         line_comment,

@@ -4,6 +4,8 @@
 /generated
 /java.hprof.txt
 /.gradle
+/bin
+/out
 
 # IntelliJ User-specific stuff
 .idea/**/workspace.xml
