@@ -1,0 +1,16 @@
+fun test(i: Int) {
+    
+}
+
+
+fun test(i: Bool) {
+
+    var j: Int = 2
+    print("int: " + j)
+
+    var j: Int = 4
+
+    print("int: " + j)
+}
+
+test(true)
