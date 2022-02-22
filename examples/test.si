@@ -13,4 +13,4 @@ fun test(i: Bool) {
     print("int: " + j)
 }
 
-test(true)
+test(2)

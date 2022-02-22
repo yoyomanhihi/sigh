@@ -2,6 +2,8 @@ package norswap.sigh.scopes;
 
 import norswap.sigh.ast.DeclarationNode;
 import norswap.sigh.ast.SighNode;
+import norswap.sigh.scopes.symbol_id.SymbolIdentifier;
+
 import java.util.HashMap;
 
 /**
@@ -23,7 +25,7 @@ public class Scope
 
     // ---------------------------------------------------------------------------------------------
 
-    private final HashMap<String, DeclarationNode> declarations = new HashMap<>();
+    private final HashMap<SymbolIdentifier, DeclarationNode> declarations = new HashMap<>();
 
     // ---------------------------------------------------------------------------------------------
 
@@ -34,10 +36,18 @@ public class Scope
 
     // ---------------------------------------------------------------------------------------------
 
+
     /**
      * Adds a new declaration to this scope.
      */
     public void declare (String identifier, DeclarationNode node) {
+        declarations.put(new SymbolIdentifier(identifier), node);
+    }
+
+    /**
+     * Adds a new declaration to this scope.
+     */
+    public void declare (SymbolIdentifier identifier, DeclarationNode node) {
         declarations.put(identifier, node);
     }
 
@@ -49,11 +59,20 @@ public class Scope
      */
     public DeclarationContext lookup (String name)
     {
-        DeclarationNode declaration = declarations.get(name);
+        return this.lookup(new SymbolIdentifier(name));
+    }
+
+    /**
+     * Looks up the name in the scope and its parents, returning a context comprising the
+     * found declaration and the scope in which it occurs, or null if not found.
+     */
+    public DeclarationContext lookup (SymbolIdentifier symbolId)
+    {
+        DeclarationNode declaration = declarations.get(symbolId);
         return declaration != null
                 ? new DeclarationContext(this, declaration)
                 : parent != null
-                    ? parent.lookup(name)
+                    ? parent.lookup(symbolId)
                     : null;
     }
 
